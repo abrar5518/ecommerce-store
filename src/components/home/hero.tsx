@@ -3,7 +3,7 @@ import React from 'react';
 
 const HeroSection = () => {
   return (
-    <section className="hero-section bg-[#212844] text-white py-6 px-4 flex flex-col items-center rounded-lg shadow-lg">
+    <section className="md:hidden hero-section bg-[#212844] text-white py-6 px-4 flex flex-col items-center rounded-lg shadow-lg">
       {/* Left Side: Text Content */}
       <div className="text-content text-center max-w-md mb-6">
         <h1 className="text-3xl md:text-4xl font-bold mb-4">ISLAMIC CLOTHING COLLECTION</h1>
