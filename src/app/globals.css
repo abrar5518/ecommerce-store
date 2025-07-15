@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply text-[18px] leading-[26px] text-[#333333] font-normal;
+    font-family: 'Hanken Grotesk', sans-serif; /* Manually applying Hanken Grotesk */
+    background-color: #FFFFFF; /* White background */
+  }
+  h1, h2 {
+    font-family: 'Hanken Grotesk', sans-serif; /* Apply the font to headings */
+  }
+.custom_container {
+  @apply px-[120px]; /* Default padding for desktop */
+}
+
+@media (max-width: 1024px) {
+  .custom_container {
+    @apply px-[60px]; /* Padding for tablets */
+  }
+}
+
+@media (max-width: 640px) {
+  .custom_container {
+    @apply px-[20px]; /* Padding for mobile */
+  }
+}
+
+
+  /* You can also add custom styles if needed */
+}
