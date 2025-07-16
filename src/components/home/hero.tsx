@@ -14,7 +14,7 @@ const HeroSection = () => {
       {/* Right Side: Image */}
       <div className="image-content mb-6">
         <Image
-          src="/assets/images/pro2.png"  // Replace with your image URL
+          src="/assets/images/pro2.png"  
           alt="Islamic Clothing"
           height={200}
           width={200}
