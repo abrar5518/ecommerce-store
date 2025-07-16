@@ -47,7 +47,7 @@ export default function AllCategoriesPage() {
         ) : (
           categories.map((category) => (
             <Link
-              href={`/category/${category.slug}`} // Link to category page
+              href={`/${category.slug}`} // Link to category page
               key={category.id}
               className="group bg-white rounded-xl shadow-lg overflow-hidden transform transition-all hover:scale-105 hover:shadow-2xl"
             >
