@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export default async function Navbar() {
   const { data: categoryData } = await Fetch<CategoryResponse>("categories");
-  const topCategories = categoryData.slice(0, 10);
+  const topCategories = categoryData.slice(0, 8);
 
 
   return (
