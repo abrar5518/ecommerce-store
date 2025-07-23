@@ -54,7 +54,7 @@ export default function AllCategoriesPage() {
               <div className="relative">
                 {/* Category Image */}
                 <img
-                  src={baseurl + category.image || "/assets/images/category-placeholder.jpg"}
+                  src={baseurl && category.image ? baseurl + category.image : "/assets/images/category-placeholder.jpg"}
                   alt={category.name}
                   className="w-full h-48 object-cover transition-all duration-300 group-hover:scale-110"
                 />

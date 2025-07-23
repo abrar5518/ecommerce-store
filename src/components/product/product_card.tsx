@@ -12,12 +12,13 @@ export default function ProductCard({
   price,
   offer,
   slug,
+  category_slug
 }: ProductCardProps) {
   // const baseurl = process.env.NEXT_PUBLIC_IMAGE_BASE_URL;
 
   return (
     <div className="relative bg-white rounded-2xl overflow-hidden border w-full hover:border-2 hover:border-primary transition-all ease-in-out hover:shadow-lg">
-      <Link href={`${category}/${slug}`} >
+      <Link href={`${category_slug}/${slug}`} >
 
         <div className="relative">
           <Image
