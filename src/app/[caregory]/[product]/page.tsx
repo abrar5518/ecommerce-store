@@ -5,6 +5,7 @@ import Productcontent from "@/components/product/product_content";
 import Gallery from "@/components/product/gallery";
 import { Fetch } from "@/utils/Fetch";
 import { SingleProductRes } from "@/types/product_list";
+import { ProductResponse } from "@/types/product_list";
 
 export default async function ProductPage({
   params,
@@ -17,6 +18,7 @@ export default async function ProductPage({
   if (!slug) {
     return <div>Product not found.</div>;
   }
+
 
   // Filter out non-product requests (like favicon, robots.txt, etc.)
   if (slug.includes(".") || slug.startsWith("_next")) {
@@ -34,6 +36,9 @@ export default async function ProductPage({
   const images = [productData.main_image, ...productData.gallery_images].filter(
     (image) => image !== null
   ) as string[];
+
+  const { data: relatedProduct } = await Fetch<ProductResponse>(`products/category/${productData.category.slug}`);
+  const fourProducts = relatedProduct.slice(0, 4);
 
   const structuredData = {
     id: productData.id,
@@ -110,14 +115,14 @@ export default async function ProductPage({
             <div className="space-y-4">
               <div className="border rounded-lg p-4">
                 <div className="flex items-center mb-2">
-                  <span className="font-bold mr-2">John Doe</span>
+                  <span className="font-bold mr-2">Muhammad Imran</span>
                   <span className="text-yellow-500">★★★★★</span>
                 </div>
                 <p className="text-text">Great product! Highly recommended.</p>
               </div>
               <div className="border rounded-lg p-4">
                 <div className="flex items-center mb-2">
-                  <span className="font-bold mr-2">Jane Smith</span>
+                  <span className="font-bold mr-2">Nasir Khan</span>
                   <span className="text-yellow-500">★★★★☆</span>
                 </div>
                 <p className="text-text">
@@ -217,16 +222,19 @@ export default async function ProductPage({
       <section className="my-14">
         <h2 className="text-2xl font-semibold mb-4">Related Products</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-          <ProductCard
-            imageUrl="/assets/images/product-1.jpg"
-            altText="Product 1"
-            productName="Product 1"
-            category="Category A"
-            price={49.99}
-            offer="10% OFF"
-            slug={"1234"}
-            category_slug="asdf"
-          />
+          {fourProducts?.map((product) => (
+            <ProductCard
+              imageUrl={product.main_image || "/assets/images/product-1.jpg"} // Fallback image if main_image is null
+              key={product.id} // Use product id as key for each ProductCard
+              altText={product.name}
+              productName={product.name}
+              category={product.category.name}
+              price={product.price}
+              offer={product.sale_price ? `${((product.price - parseFloat(product.sale_price)) / product.price * 100).toFixed(0)}% Off` : "No Offer"}
+              slug={product.slug}
+              category_slug={product.category.slug}
+            />
+          ))}
         </div>
       </section>
     </div>

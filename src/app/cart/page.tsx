@@ -1,7 +1,7 @@
 "use client";
 //@ts-nocheck
 import { useCart } from "@/context/CartContext";
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { loadStripe, StripeElementsOptions } from "@stripe/stripe-js";
 import {
   Elements,
@@ -14,6 +14,8 @@ import {
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 import Link from "next/link";
 import Image from "next/image";
+import { ShippingSettings } from "@/types/shipping";
+import {Fetch} from "@/utils/Fetch";
 
 // Initialize Stripe - Using your real publishable key
 const stripePromise = loadStripe(
@@ -99,10 +101,10 @@ const CheckoutForm = ({
     setCustomerInfo(
       // @ts-expect-error - React setState with computed property key
       (prev) =>
-        ({
-          ...prev,
-          [field]: value,
-        } as CustomerInfo)
+      ({
+        ...prev,
+        [field]: value,
+      } as CustomerInfo)
     );
   };
 
@@ -284,8 +286,7 @@ const CheckoutForm = ({
       // Verify payment status
       if ((order as { status: string }).status !== "COMPLETED") {
         throw new Error(
-          `Payment not completed. Status: ${
-            (order as { status: string }).status
+          `Payment not completed. Status: ${(order as { status: string }).status
           }`
         );
       }
@@ -377,8 +378,7 @@ const CheckoutForm = ({
     } catch (error) {
       console.error("❌ PayPal payment processing error:", error);
       setPaymentError(
-        `PayPal payment failed: ${
-          error instanceof Error ? error.message : "Unknown error"
+        `PayPal payment failed: ${error instanceof Error ? error.message : "Unknown error"
         }`
       );
     } finally {
@@ -639,11 +639,10 @@ const CheckoutForm = ({
             <h3 className="text-lg font-semibold mb-4">Payment Method</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div
-                className={`p-4 border rounded-lg cursor-pointer transition ${
-                  paymentMethod === "stripe"
+                className={`p-4 border rounded-lg cursor-pointer transition ${paymentMethod === "stripe"
                     ? "border-blue-500 bg-blue-50"
                     : "border-gray-300 hover:border-gray-400"
-                }`}
+                  }`}
                 onClick={() => setPaymentMethod("stripe")}
               >
                 <div className="flex items-center">
@@ -664,11 +663,10 @@ const CheckoutForm = ({
                 </div>
               </div>
               <div
-                className={`p-4 border rounded-lg cursor-pointer transition ${
-                  paymentMethod === "paypal"
+                className={`p-4 border rounded-lg cursor-pointer transition ${paymentMethod === "paypal"
                     ? "border-blue-500 bg-blue-50"
                     : "border-gray-300 hover:border-gray-400"
-                }`}
+                  }`}
                 onClick={() => setPaymentMethod("paypal")}
               >
                 <div className="flex items-center">
@@ -763,14 +761,13 @@ const CheckoutForm = ({
                   !cardComplete.expiry ||
                   !cardComplete.cvc
                 }
-                className={`w-full mt-6 py-4 rounded-lg font-semibold text-lg transition ${
-                  isProcessing ||
-                  !cardComplete.number ||
-                  !cardComplete.expiry ||
-                  !cardComplete.cvc
+                className={`w-full mt-6 py-4 rounded-lg font-semibold text-lg transition ${isProcessing ||
+                    !cardComplete.number ||
+                    !cardComplete.expiry ||
+                    !cardComplete.cvc
                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                     : "bg-blue-600 text-white hover:bg-blue-700"
-                }`}
+                  }`}
               >
                 {isProcessing ? "Processing..." : `Pay $${total.toFixed(2)}`}
               </button>
@@ -871,6 +868,7 @@ const CartPage = () => {
   });
   const [coupon, setCoupon] = useState("");
   const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
+const [shippingFee, setShippingFee] = useState<number>(0);
 
   const handleQuantityChange = (id: number, delta: number) => {
     const item = cart.find((item) => item.id === id);
@@ -927,7 +925,23 @@ const CartPage = () => {
     (sum, item) => sum + item.price * item.quantity,
     0
   );
-  const shipping = subtotal > 100 ? 0 : 10;
+useEffect(() => {
+  const fetchShippingFee = async () => {
+    try {
+      const response = await Fetch<{ data: ShippingSettings }>("shipping-settings");
+      const cost = parseFloat(response.data.shipping_cost);
+      setShippingFee(cost);
+      console.log("✅ Shipping Fee Fetched:", cost);
+    } catch (error) {
+      console.error("❌ Failed to fetch shipping settings", error);
+      setShippingFee(10); // fallback fee
+    }
+  };
+
+  fetchShippingFee();
+}, []);
+
+  const shipping = subtotal > 100 ? 0 : shippingFee;
   const discount = appliedCoupon === "SAVE10" ? subtotal * 0.1 : 0;
   const total = subtotal + shipping - discount;
 
@@ -998,10 +1012,13 @@ const CartPage = () => {
                           <h3 className="font-semibold text-gray-900 text-lg">
                             {item.name}
                           </h3>
-                          <div className="text-sm text-gray-500 mt-1">
-                            Size: {item.size || "N/A"} • Color:{" "}
-                            {item.color || "N/A"}
-                          </div>
+                          {item.attributes &&
+                            Object.entries(item.attributes).map(([key, value]) => (
+                              <p key={key}>
+                                <strong>{key}:</strong> {value}
+                              </p>
+                            ))}
+
                           <div className="text-xl font-bold text-blue-600 mt-2">
                             ${item.price.toFixed(2)}
                           </div>
@@ -1058,11 +1075,10 @@ const CartPage = () => {
                     />
                     <button
                       onClick={handleApplyCoupon}
-                      className={`px-6 py-3 rounded-lg font-medium transition ${
-                        appliedCoupon
+                      className={`px-6 py-3 rounded-lg font-medium transition ${appliedCoupon
                           ? "bg-green-100 text-green-700 cursor-not-allowed"
                           : "bg-blue-600 text-white hover:bg-blue-700"
-                      }`}
+                        }`}
                       disabled={!!appliedCoupon}
                     >
                       {appliedCoupon ? "✓ Applied" : "Apply"}

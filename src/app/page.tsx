@@ -31,6 +31,7 @@ export default async function Home() {
   const { data: categoryData } = await Fetch<CategoryResponse>("categories");
   const { data: productData } = await Fetch<ProductResponse>("products");
   const fourProducts = productData.slice(0, 4);
+  const topCategories = categoryData.slice(2, 10);
 
   // console.log(data);
 
@@ -84,7 +85,7 @@ export default async function Home() {
 
         <div className="grid grid-cols-4 md:grid-cols-8 lg:grid-cols-8 gap-5 mt-5">
           {/* // grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-5 mt-5 mb-16 */}
-          {categoryData?.map((category) => (
+          {topCategories?.map((category) => (
             <CategoryCard
               key={category.slug} // Use category id as key for each CategoryCard
               slug={category.slug}

@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export default async function Navbar() {
   const { data: categoryData } = await Fetch<CategoryResponse>("categories");
-  const topCategories = categoryData.slice(0, 8);
+  const topCategories = categoryData.slice(0, 7);
 
 
   return (
@@ -19,16 +19,16 @@ export default async function Navbar() {
         </div>
         <Link
           href={`/shop`} className="bg-secondary px-4 py-2 rounded-full hover:bg-primary hover:text-white focus:outline-none" >
-Shop
-          </Link>
-            <Link
+          Shop
+        </Link>
+        <Link
           href={`/all-categories`} className="bg-secondary px-4 py-2 rounded-full hover:bg-primary hover:text-white focus:outline-none" >
-Categories
-          </Link>
+          Categories
+        </Link>
 
         {topCategories.map((category) => (
           <Link
-          href={`/${category.slug}`}
+            href={`/${category.slug}`}
             key={category.id}
             className="bg-secondary px-4 py-2 rounded-full hover:bg-primary hover:text-white focus:outline-none"
           >

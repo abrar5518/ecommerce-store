@@ -1,8 +1,9 @@
 "use client";
+
 import { useState, useEffect } from "react";
 import { Icon } from "@iconify/react";
 import { useCart } from "@/context/CartContext";
-import { useRouter } from "next/navigation"; // Correct import for App Router
+import { useRouter } from "next/navigation";
 
 interface Variation {
   attribute: {
@@ -15,6 +16,8 @@ interface Variation {
     id: number;
     attribute_id: number;
     name: string;
+    image: string | null;
+    color: string | null;
     created_at: string;
     updated_at: string;
   };
@@ -45,12 +48,11 @@ const Productcontent: React.FC<ProductContentProps> = ({
     [key: string]: string | undefined;
   }>({});
   const [quantity, setQuantity] = useState<number>(1);
-  const [isClient, setIsClient] = useState(false); // State to check if it's client-side
+  const [isClient, setIsClient] = useState(false);
   const router = useRouter();
 
-  // UseEffect to set the default selected values based on available variations
   useEffect(() => {
-    setIsClient(true); // Set to true once the component is mounted on the client
+    setIsClient(true);
 
     const defaultSelections: { [key: string]: string | undefined } = {};
     variations.forEach((variation) => {
@@ -60,6 +62,7 @@ const Productcontent: React.FC<ProductContentProps> = ({
     });
     setSelectedAttributes(defaultSelections);
   }, [variations]);
+  
 
   const handleAttributeSelect = (attribute: string, value: string) => {
     setSelectedAttributes((prev) => ({
@@ -67,6 +70,15 @@ const Productcontent: React.FC<ProductContentProps> = ({
       [attribute]: value,
     }));
   };
+  const filteredAttributes: { [key: string]: string } = Object.entries(selectedAttributes).reduce(
+  (acc, [key, value]) => {
+    if (value !== undefined) {
+      acc[key] = value;
+    }
+    return acc;
+  },
+  {} as { [key: string]: string }
+);
 
   const handleAddToCart = () => {
     const missingAttributes = Object.values(selectedAttributes).some(
@@ -76,20 +88,15 @@ const Productcontent: React.FC<ProductContentProps> = ({
       alert("Please select all attributes.");
     } else {
       const cartItem = {
-        id: productData.id,
-        name: productData.name,
-        price: productData.price,
-        quantity,
-        size: selectedAttributes["Size"],
-        color: selectedAttributes["Color"],
-        image: productData.main_image || undefined,
-      };
+  id: productData.id,
+  name: productData.name,
+  price: productData.price,
+  quantity,
+  image: productData.main_image || undefined,
+  attributes: filteredAttributes,
+};
 
       addToCart(cartItem);
-
-      // alert(
-      //   `Added to cart: ${JSON.stringify(cartItem)}, Quantity: ${quantity}`
-      // );
     }
   };
 
@@ -100,29 +107,27 @@ const Productcontent: React.FC<ProductContentProps> = ({
     if (missingAttributes) {
       alert("Please select all attributes.");
     } else {
-      const cartItem = {
-        id: productData.id,
-        name: productData.name,
-        price: productData.price,
-        quantity,
-        size: selectedAttributes["Size"],
-        color: selectedAttributes["Color"],
-        image: productData.main_image || undefined,
-      };
+     const cartItem = {
+  id: productData.id,
+  name: productData.name,
+  price: productData.price,
+  quantity,
+  image: productData.main_image || undefined,
+  attributes: filteredAttributes,
+};
 
       addToCart(cartItem);
 
-      // Only navigate if it's client-side
       if (isClient) {
-        // Use URLSearchParams to pass data
         const searchParams = new URLSearchParams();
         searchParams.append("productId", String(productData.id));
         searchParams.append("quantity", String(quantity));
-        searchParams.append("size", selectedAttributes["Size"] || "");
-        searchParams.append("color", selectedAttributes["Color"] || "");
         searchParams.append("price", String(productData.price));
+        Object.entries(selectedAttributes).forEach(([key, value]) => {
+          searchParams.append(key, value || "");
+        });
 
-        router.push(`/cart`);
+        router.push(`/cart?${searchParams.toString()}`);
       }
     }
   };
@@ -142,27 +147,59 @@ const Productcontent: React.FC<ProductContentProps> = ({
   return (
     <div>
       {/* Dynamically render each attribute */}
-      {Object.keys(groupedAttributes).map((attribute) => (
-        <div key={attribute} className="mb-6">
-          <h3 className="font-semibold mb-2">Select {attribute}:</h3>
-          <div className="flex gap-2">
-            {groupedAttributes[attribute].map((value) => (
-              <button
-                key={value}
-                onClick={() => handleAttributeSelect(attribute, value)}
-                className={`px-4 py-2 rounded-full border transition 
-                  ${
-                    selectedAttributes[attribute] === value
-                      ? "bg-black text-white border-black"
-                      : "bg-white text-black border-gray-300 hover:border-black"
-                  }`}
-              >
-                {value}
-              </button>
-            ))}
-          </div>
-        </div>
-      ))}
+      {Object.entries(groupedAttributes).map(([attribute]) => (
+  <div key={attribute} className="mb-4">
+    <h3 className="font-semibold mb-2">{attribute}:</h3>
+    <div className="flex flex-wrap gap-2">
+      {variations
+        .filter((variation) => variation.attribute.name === attribute)
+        .map(({ value }) => {
+          const isSelected = selectedAttributes[attribute] === value.name;
+          const hasColor = !!value.color;
+          const hasImage = !!value.image;
+          const style = isSelected
+            ? "border-2 border-black"
+            : "border border-gray-300 hover:border-black";
+
+          return (
+            <button
+              key={value.id}
+              onClick={() => handleAttributeSelect(attribute, value.name)}
+              className={`w-10 h-10 rounded-full transition flex items-center justify-center ${style}`}
+              style={{
+                backgroundColor: hasColor ? value.color! : undefined,
+                backgroundImage:
+                  !hasColor && hasImage ? `url(${value.image})` : undefined,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+              }}
+            >
+              {hasColor || hasImage ? (
+                isSelected && (
+                  <svg
+                    className="w-4 h-4 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M5 13l4 4L19 7"
+                    />
+                  </svg>
+                )
+              ) : (
+                <span className="text-sm text-black">{value.name}</span>
+              )}
+            </button>
+          );
+        })}
+    </div>
+  </div>
+))}
+
 
       {/* Quantity input */}
       <div className="mb-6">
@@ -176,7 +213,7 @@ const Productcontent: React.FC<ProductContentProps> = ({
         />
       </div>
 
-      {/* Add to Cart and Buy Now buttons */}
+      {/* Buttons */}
       <div className="flex items-center space-x-6 mt-2">
         <button
           onClick={handleAddToCart}

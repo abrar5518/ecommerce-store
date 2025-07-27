@@ -50,6 +50,8 @@ export interface Variation {
     id: number;
     attribute_id: number;
     name: string;
+    color: string | null;
+    image: string | null;
     created_at: string;
     updated_at: string;
   };
