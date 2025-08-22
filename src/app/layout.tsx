@@ -40,6 +40,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={hankenGrotesk.variable}>
+      <head>
+        <meta name="google-site-verification" content="G2yEVPGFA8aRfHfMA3gOsUTkTW8MHUb_4_XSsZA9xA8" />
+      </head>
       <body className="antialiased bg-white text-[#333]">
         <CartProvider>
           <Topbar />

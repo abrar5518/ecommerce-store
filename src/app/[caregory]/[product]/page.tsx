@@ -6,6 +6,45 @@ import Gallery from "@/components/product/gallery";
 import { Fetch } from "@/utils/Fetch";
 import { SingleProductRes } from "@/types/product_list";
 import { ProductResponse } from "@/types/product_list";
+import type { Metadata } from "next";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { product: string };
+}): Promise<Metadata> {
+  const slug = params.product;
+  const response = await Fetch<SingleProductRes>(`products/${slug}`);
+  const product = response.data;
+
+  return {
+    title: `${product.meta_title} | Best Fashion llc`,
+    description: product.meta_description || product.short_description?.replace(/<[^>]*>/g, ""),
+    keywords: product.meta_keywords || "fashion, clothing, accessories",
+     alternates: {
+          canonical: `${process.env.NEXT_PUBLIC_BASE_URL}/${product.category.slug}/${slug}`,
+        },
+    openGraph: {
+      title: product.meta_title || product.name,
+      description: product.meta_description?.replace(/<[^>]*>/g, ""),
+      url: `${process.env.NEXT_PUBLIC_BASE_URL}/products/${slug}`,
+      images: [
+        {
+          url: product.main_image || "/assets/images/default-product.jpg",
+          width: 800,
+          height: 600,
+          alt: product.name,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: product.meta_title || product.name,
+      description: product.meta_description?.replace(/<[^>]*>/g, ""),
+      images: [product.main_image || "/assets/images/default-product.jpg"],
+    },
+  };
+}
 
 export default async function ProductPage({
   params,
@@ -75,7 +114,7 @@ export default async function ProductPage({
       <div className="grid grid-cols-1 md:grid-cols-2">
         {/* Left Column: Product Images */}
         <div>
-          <Gallery images={images || []} />
+          <Gallery images={images || []}  />
         </div>
 
         {/* Right Column: Product Details */}
@@ -224,8 +263,8 @@ export default async function ProductPage({
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
           {fourProducts?.map((product) => (
             <ProductCard
-              imageUrl={product.main_image || "/assets/images/product-1.jpg"} // Fallback image if main_image is null
-              key={product.id} // Use product id as key for each ProductCard
+              imageUrl={product.main_image || "/assets/images/product-1.jpg"}
+              key={product.id}
               altText={product.name}
               productName={product.name}
               category={product.category.name}

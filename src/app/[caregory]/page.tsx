@@ -1,7 +1,66 @@
 import ProductCard from "@/components/product/product_card";
 import { Fetch } from "@/utils/Fetch";
 import { ProductResponse } from "@/types/product_list";
-import { CategoryResponse } from "@/types/categories";
+import { CategoryResponse, Category } from "@/types/categories";
+import { Metadata } from "next";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { caregory: string };
+}): Promise<Metadata> {
+  const slug = params?.caregory;
+
+  try {
+    // Category details fetch by slug
+    const categoryResponse = await Fetch<{ data: Category }>(
+      `categories/${slug}`
+    );
+
+    const category = categoryResponse.data;
+
+    if (category) {
+      return {
+        title: `${category.meta_title || category.name} | Best Fashion llc`,
+        description: category.meta_description || `Shop ${category.name}`,
+        keywords: category.meta_keywords || "",
+        alternates: {
+          canonical: `${process.env.NEXT_PUBLIC_BASE_URL}/${slug}`,
+        },
+        openGraph: {
+          title: category.meta_title || category.name,
+          description: category.meta_description || `Shop ${category.name}`,
+          images: [
+            {
+              url: category.image
+                ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/${category.image}`
+                : "/assets/images/default-og.jpg",
+              alt: category.name,
+            },
+          ],
+        },
+        twitter: {
+          card: "summary_large_image",
+          title: category.meta_title || category.name,
+          description: category.meta_description || `Shop ${category.name}`,
+          images: [
+            category.image
+              ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/${category.image}`
+              : "/assets/images/default-og.jpg",
+          ],
+        },
+      };
+    }
+  } catch (error) {
+    console.error("Failed to fetch metadata:", error);
+  }
+
+  return {
+    title: "Category",
+    description: "Browse our product categories",
+  };
+}
+
 
 export default async function CategoryPage({
   params,
@@ -9,7 +68,7 @@ export default async function CategoryPage({
   params: Promise<{ caregory: string }>;
 }) {
   const resolvedParams = await params;
-  const slug = resolvedParams?.caregory; // Ensure category is available from params
+  const slug = resolvedParams?.caregory;
 
   if (!slug) {
     // If slug is undefined, handle it gracefully (e.g., redirect or show an error)
@@ -111,10 +170,10 @@ export default async function CategoryPage({
               offer={
                 product.sale_price
                   ? `${(
-                      ((product.price - parseFloat(product.sale_price)) /
-                        product.price) *
-                      100
-                    ).toFixed(0)}% Off`
+                    ((product.price - parseFloat(product.sale_price)) /
+                      product.price) *
+                    100
+                  ).toFixed(0)}% Off`
                   : "No Offer"
               }
             />
