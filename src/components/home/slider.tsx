@@ -6,7 +6,7 @@ export default function Slider() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const slides = [
     {
-      title: "Best Deal Online on Islamic Apparel",
+      title: "Best Deal on Islamic Apparel",
       subtitle: "ISLAMIC CLOTHING COLLECTION",
       discription: "UP to 70% OFF",
       image: "/assets/images/pro3.png", // Product image

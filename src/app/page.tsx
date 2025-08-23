@@ -16,7 +16,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 
   return {
-    title: "Islamic Clothing, Hijabs, Fragrances, and More | Best Fashion ",
+    title: "Islamic Clothing, Hijabs, Fragrances, and More | Best Fashion llc ",
     description: "Shop for a wide range of Islamic products including hijabs, thobes, Islamic caps, fragrances, and more at IslamicMart. Enjoy modest fashion and quality Islamic accessories.",
     keywords: "thobes, thobes for men, Islamic clothing for men, modest mens wear, buy thobes online, Muslim thobes, best fashion llc",
     robots: "index, follow",
