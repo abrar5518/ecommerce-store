@@ -6,45 +6,7 @@ import Gallery from "@/components/product/gallery";
 import { Fetch } from "@/utils/Fetch";
 import { SingleProductRes } from "@/types/product_list";
 import { ProductResponse } from "@/types/product_list";
-import type { Metadata } from "next";
-
-export async function generateMetadata({
-  params,
-}: {
-  params: { product: string };
-}): Promise<Metadata> {
-  const slug = params.product;
-  const response = await Fetch<SingleProductRes>(`products/${slug}`);
-  const product = response.data;
-
-  return {
-    title: `${product.meta_title} | Best Fashion llc`,
-    description: product.meta_description || product.short_description?.replace(/<[^>]*>/g, ""),
-    keywords: product.meta_keywords || "fashion, clothing, accessories",
-     alternates: {
-          canonical: `${process.env.NEXT_PUBLIC_BASE_URL}/${product.category.slug}/${slug}`,
-        },
-    openGraph: {
-      title: product.meta_title || product.name,
-      description: product.meta_description?.replace(/<[^>]*>/g, ""),
-      url: `${process.env.NEXT_PUBLIC_BASE_URL}/products/${slug}`,
-      images: [
-        {
-          url: product.main_image || "/assets/images/default-product.jpg",
-          width: 800,
-          height: 600,
-          alt: product.name,
-        },
-      ],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: product.meta_title || product.name,
-      description: product.meta_description?.replace(/<[^>]*>/g, ""),
-      images: [product.main_image || "/assets/images/default-product.jpg"],
-    },
-  };
-}
+// import type { Metadata } from "next";
 
 export default async function ProductPage({
   params,
