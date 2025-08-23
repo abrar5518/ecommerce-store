@@ -1,7 +1,47 @@
+
 import ProductCard from "@/components/product/product_card";
 import { Fetch } from "@/utils/Fetch";
 import { ProductResponse } from "@/types/product_list";
 import { CategoryResponse } from "@/types/categories";
+import { Metadata } from "next";
+
+export async function generateMetadata({ params }: { params: Promise<{ caregory: string }> }): Promise<Metadata> {
+  const { caregory } = await params;
+  console.log("Generating metadata for category:", caregory);
+  const category = await Fetch<CategoryResponse>(`categories/${caregory}`);
+  // const category = await response.json();
+  // console.log("Fetched category data:", category.data[0].meta_title);
+
+  return {
+    title: category.data[0]?.meta_title || "Thobe's - Latest Thobe Design",
+    description: category.data[0]?.meta_description || "This is the simple test description for Thobe's category.",
+    keywords: category.data[0]?.meta_keywords || "Thobe, Latest Thobe Design, Fashion, Clothing",
+    alternates: {
+      canonical: `${process.env.NEXT_PUBLIC_BASE_URL}/${caregory}`,
+    },
+    openGraph: {
+      title: category.data[0]?.meta_title || "Thobe's - Latest Thobe Design",
+      description: category.data[0]?.meta_description || "This is the simple test description for Thobe's category.",
+      url: `${process.env.NEXT_PUBLIC_BASE_URL}/${caregory}`,
+      images: [
+        {
+          url: category.data[0]?.image || "/assets/images/default-category.jpg",
+          width: 800,
+          height: 600,
+          alt: category.data[0]?.meta_title || "Thobe's - Latest Thobe Design",
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: category.data[0]?.meta_title || "Thobe's - Latest Thobe Design",
+      description: category.data[0]?.meta_description || "This is the simple test description for Thobe's category.",
+      images: category.data[0]?.image || "/assets/images/default-category.jpg",
+    },
+
+  };
+}
+
 
 export default async function CategoryPage({
   params,
