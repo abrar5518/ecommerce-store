@@ -1,42 +1,62 @@
-
+import ProductListSchema from "@/components/schema/productList";
+import { mapProductsForSchema } from "@/utils/lib/mapProducts";
 import ProductCard from "@/components/product/product_card";
 import { Fetch } from "@/utils/Fetch";
 import { ProductResponse } from "@/types/product_list";
 import { CategoryResponse } from "@/types/categories";
 import { Metadata } from "next";
 
+export interface Category {
+  id: number;
+  user_id: number;
+  name: string;
+  slug: string;
+  meta_title: string;
+  meta_description: string;
+  meta_keywords: string;
+  image: string;
+  created_at: string;
+  updated_at: string;
+}
+
+// Response structure from the API
+export interface CategoryData {
+  status: string;
+  message: string;
+  data: Category; // The category object is inside the "data" field
+}
+
 export async function generateMetadata({ params }: { params: Promise<{ caregory: string }> }): Promise<Metadata> {
   const { caregory } = await params;
-  console.log("Generating metadata for category:", caregory);
-  const category = await Fetch<CategoryResponse>(`categories/${caregory}`);
-  // const category = await response.json();
-  // console.log("Fetched category data:", category.data[0].meta_title);
+
+  const response = await Fetch<CategoryData>(`categories/${caregory}`);
+  const category = response.data;
 
   return {
-    title: category.data[0]?.meta_title || "Thobe's - Latest Thobe Design",
-    description: category.data[0]?.meta_description || "This is the simple test description for Thobe's category.",
-    keywords: category.data[0]?.meta_keywords || "Thobe, Latest Thobe Design, Fashion, Clothing",
+    title: category.meta_title || "Thobe's - Latest Thobe Design",
+    description: category.meta_description || "This is the simple test description for Thobe's category.",
+    keywords: category.meta_keywords || "Thobe, Latest Thobe Design, Fashion, Clothing",
     alternates: {
       canonical: `${process.env.NEXT_PUBLIC_BASE_URL}/${caregory}`,
     },
     openGraph: {
-      title: category.data[0]?.meta_title || "Thobe's - Latest Thobe Design",
-      description: category.data[0]?.meta_description || "This is the simple test description for Thobe's category.",
+      title: category.meta_title || "Thobe's - Latest Thobe Design",
+      description: category.meta_description || "This is the simple test description for Thobe's category.",
       url: `${process.env.NEXT_PUBLIC_BASE_URL}/${caregory}`,
       images: [
         {
-          url: category.data[0]?.image || "/assets/images/default-category.jpg",
+          url: category.image || "/assets/images/default-category.jpg",
           width: 800,
           height: 600,
-          alt: category.data[0]?.meta_title || "Thobe's - Latest Thobe Design",
+          alt: category.meta_title || "Thobe's - Latest Thobe Design",
         },
       ],
     },
     twitter: {
       card: 'summary_large_image',
-      title: category.data[0]?.meta_title || "Thobe's - Latest Thobe Design",
-      description: category.data[0]?.meta_description || "This is the simple test description for Thobe's category.",
-      images: category.data[0]?.image || "/assets/images/default-category.jpg",
+      title: category.meta_title || "Thobe's - Latest Thobe Design",
+      description: category.meta_description || "This is the simple test description for Thobe's category.",
+      images: category.image || "/assets/images/default-category.jpg",
     },
 
   };
@@ -85,8 +105,11 @@ export default async function CategoryPage({
   const categories = categoryData;
   const products = productData;
 
+    // 🔥 Convert API products into schema format
+  const mapProducts = mapProductsForSchema(productData);
   return (
     <div className="min-h-screen bg-gray-50 custom_container py-8">
+      <ProductListSchema products={mapProducts} categoryName={slug} />
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
         <div>

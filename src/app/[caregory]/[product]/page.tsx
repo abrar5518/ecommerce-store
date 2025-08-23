@@ -6,7 +6,47 @@ import Gallery from "@/components/product/gallery";
 import { Fetch } from "@/utils/Fetch";
 import { SingleProductRes } from "@/types/product_list";
 import { ProductResponse } from "@/types/product_list";
-// import type { Metadata } from "next";
+import type { Metadata } from "next";
+import ProductSchema from "@/components/schema/product";
+
+export async function generateMetadata({ params }: { params: Promise<{ product: string }> }): Promise<Metadata> {
+  const { product } = await params;
+  // console.log("Generating metadata for product:", product);
+
+  const response = await Fetch<SingleProductRes>(`products/${product}`);
+  const ProductData = response.data;
+  // console.log("Product Data:", Product);
+
+  return {
+    title: ProductData.meta_title || "Thobe's - Latest Thobe Design",
+    description: ProductData.meta_description || "This is the simple test description for Thobe's category.",
+    keywords: ProductData.meta_keywords || "Thobe, Latest Thobe Design, Fashion, Clothing",
+    alternates: {
+      canonical: `${process.env.NEXT_PUBLIC_BASE_URL}/${ProductData.category.slug}/${product}`,
+    },
+    openGraph: {
+      title: ProductData.meta_title || "Thobe's - Latest Thobe Design",
+      description: ProductData.meta_description || "This is the simple test description for Thobe's category.",
+      url: `${process.env.NEXT_PUBLIC_BASE_URL}/${ProductData.category.slug}/${product}`,
+      images: [
+        {
+          url: ProductData.main_image || "/assets/images/default-category.jpg",
+          width: 800,
+          height: 600,
+          alt: ProductData.meta_title || "Thobe's - Latest Thobe Design",
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: ProductData.meta_title || "Thobe's - Latest Thobe Design",
+      description: ProductData.meta_description || "This is the simple test description for Thobe's category.",
+      images: ProductData.main_image || "/assets/images/default-category.jpg",
+    },
+
+  };
+}
+
 
 export default async function ProductPage({
   params,
@@ -53,9 +93,20 @@ export default async function ProductPage({
     // sizes: sizes, // Added structured sizes
     // colors: colors, // Added structured colors
   };
+    const product = {
+    name: productData.name,
+    description: productData.description,
+    sku: productData.sku || "SKU12345",
+    brand: productData.brand.name || "Best Fashion",
+    image: productData.main_image || "/assets/images/default-product.jpg",
+    url: `${process.env.NEXT_PUBLIC_BASE_URL}/${productData.category.slug}/${slug}`,
+    price: productData.price.toString() || "0.00",
+    currency: productData.currency || "USD",
+  };
 
   return (
     <div className="custom_container py-5">
+      <ProductSchema {...product} />
       <nav className="text-sm mb-4" aria-label="Breadcrumb">
         <ol className="list-reset flex text-text">
           <li>
