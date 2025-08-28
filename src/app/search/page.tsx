@@ -31,6 +31,21 @@ const SearchResultsPage = () => {
     }
   };
 
+    // Schema for the Search Results page
+  const schema = {
+    "@context": "https://schema.org",
+    "@type": "SearchResultsPage",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": `${process.env.NEXT_PUBLIC_BASE_URL}/search?query=${query}`,
+    },
+    "headline": `Search Results for ${query}`,
+    "description": "Here are the products related to your search query.",
+    "query": query,
+    "url": `${process.env.NEXT_PUBLIC_BASE_URL}/search?query=${query}`,
+  };
+
+
   return (
     <div className="min-h-screen bg-gray-50 custom_container py-8">
       {/* Header */}
@@ -72,6 +87,8 @@ const SearchResultsPage = () => {
           ))
         )}
       </div>
+            {/* Add Schema to the page */}
+      <script type="application/ld+json">{JSON.stringify(schema)}</script>
     </div>
   );
 };

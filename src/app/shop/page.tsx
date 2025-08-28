@@ -5,7 +5,9 @@ import { ProductResponse } from "@/types/product_list";
 import { CategoryResponse } from "@/types/categories";
 import ProductCard from "@/components/product/product_card"; // Import ProductCard
 import ProductListSchema from "@/components/schema/productList";
-import { mapProductsForSchema } from "@/utils/lib/mapProducts";
+import Breadcrumb from "@/components/schema/breadcrumbs";
+
+
 
 export default function ShopPage() {
   const [products, setProducts] = useState<ProductResponse["data"]>([]);
@@ -63,11 +65,19 @@ export default function ShopPage() {
 
     setFilteredProducts(filtered);
   };
-    // 🔥 Convert API products into schema format
-  const mapProducts = mapProductsForSchema(products);
+      // Breadcrumb JSON-LD
+  const breadcrumbSchema = [
+    { name: "Home", url: "" },
+    {
+      name: "Shop",
+      url: `/shop`,
+    }
+  ];
+
   return (
     <div className="min-h-screen bg-gray-50 custom_container py-8">
-      <ProductListSchema products={mapProducts} categoryName={"/shop"} />
+      <ProductListSchema products={products} />
+      <Breadcrumb items={breadcrumbSchema} />
       {/* Header Section with Search and Filters */}
       <div className="flex flex-col md:flex-row justify-between gap-6 mb-8">
         <div className="w-full md:w-2/5">

@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Fetch } from "@/utils/Fetch";
 import { CategoryResponse } from "@/types/categories";
 import Link from "next/link";
+import Breadcrumb from "@/components/schema/breadcrumbs";
 
 export default function AllCategoriesPage() {
   const [categories, setCategories] = useState<CategoryResponse["data"]>([]);
@@ -25,9 +26,34 @@ export default function AllCategoriesPage() {
   }, []);
 
   const baseurl = process.env.NEXT_PUBLIC_IMAGE_BASE_URL;
-
+    // Breadcrumb JSON-LD
+  const breadcrumbSchema = [
+    { name: "Home", url: "" },
+    {
+      name: "All Categories",
+      url: `/all-categories`,
+    }
+  ];
   return (
     <div className="min-h-screen bg-gray-50 custom_container py-8">
+      <Breadcrumb items={breadcrumbSchema} />
+      <nav className="text-sm mb-4" aria-label="Breadcrumb">
+        <ol className="list-reset flex text-text">
+          <li>
+            <Link href="/" className="hover:underline text-primary">
+              Home
+            </Link>
+            <span className="mx-2">/</span>
+          </li>
+          <li>
+            <li className="text-text font-semibold">
+              All Categories
+            </li>
+            {/* <span className="mx-2">/</span> */}
+          </li>
+          {/* <li className="text-text font-semibold">Product</li> */}
+        </ol>
+      </nav>
       {/* Header */}
       <div className="text-center mb-8">
         <h1 className="text-4xl font-bold text-primary mb-4">Explore Our Categories</h1>

@@ -7,8 +7,8 @@ import { Fetch } from "@/utils/Fetch";
 import { SingleProductRes } from "@/types/product_list";
 import { ProductResponse } from "@/types/product_list";
 import type { Metadata } from "next";
-import ProductSchema from "@/components/schema/product";
-
+import ProductSchema from "@/components/schema/productSchema";
+import Breadcrumb from "@/components/schema/breadcrumbs";
 export async function generateMetadata({ params }: { params: Promise<{ product: string }> }): Promise<Metadata> {
   const { product } = await params;
   // console.log("Generating metadata for product:", product);
@@ -93,20 +93,41 @@ export default async function ProductPage({
     // sizes: sizes, // Added structured sizes
     // colors: colors, // Added structured colors
   };
-    const product = {
-    name: productData.name,
-    description: productData.description,
-    sku: productData.sku || "SKU12345",
-    brand: productData.brand.name || "Best Fashion",
-    image: productData.main_image || "/assets/images/default-product.jpg",
-    url: `${process.env.NEXT_PUBLIC_BASE_URL}/${productData.category.slug}/${slug}`,
-    price: productData.price.toString() || "0.00",
-    currency: productData.currency || "USD",
-  };
+
+  // Breadcrumb JSON-LD
+  const breadcrumbSchema = [
+    { name: "Home", url: "" },
+    {
+      name: productData.category.name,
+      url: `/${productData.category.slug}`,
+    },
+    {
+      name: productData.name,
+      url: `/${productData.category.slug}/${slug}`,
+    },
+  ];
+
+  // review schema data
+
+
+
 
   return (
     <div className="custom_container py-5">
-      <ProductSchema {...product} />
+      <Breadcrumb items={breadcrumbSchema} />
+      <ProductSchema
+  name={productData.name}
+  description={productData.description}
+  sku={productData.sku || "SKU12345"}
+  brand={productData.brand.name || "Best Fashion"}
+  image={productData.main_image || "/assets/images/default-product.jpg"}
+  price={productData.price.toString() || "0.00"}
+  currency={productData.currency || "USD"}
+  aggregateRating={{
+    ratingValue: 4.5, // yaha backend ka actual avg rating dalna better hoga
+    reviewCount: 25,  // yaha backend ka total review count dalna better hoga
+  }}
+/>
       <nav className="text-sm mb-4" aria-label="Breadcrumb">
         <ol className="list-reset flex text-text">
           <li>
@@ -116,7 +137,7 @@ export default async function ProductPage({
             <span className="mx-2">/</span>
           </li>
           <li>
-            <Link href="#" className="hover:underline text-primary">
+            <Link href={`/${productData.category.slug}`} className="hover:underline text-primary">
               Category
             </Link>
             <span className="mx-2">/</span>
@@ -127,7 +148,7 @@ export default async function ProductPage({
       <div className="grid grid-cols-1 md:grid-cols-2">
         {/* Left Column: Product Images */}
         <div>
-          <Gallery images={images || []}  />
+          <Gallery images={images || []} />
         </div>
 
         {/* Right Column: Product Details */}

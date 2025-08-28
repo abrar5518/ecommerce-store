@@ -1,10 +1,51 @@
 import ProductListSchema from "@/components/schema/productList";
-import { mapProductsForSchema } from "@/utils/lib/mapProducts";
 import ProductCard from "@/components/product/product_card";
 import { Fetch } from "@/utils/Fetch";
 import { ProductResponse } from "@/types/product_list";
 import { CategoryResponse } from "@/types/categories";
 import { Metadata } from "next";
+import Link from "next/link";
+import Breadcrumb from "@/components/schema/breadcrumbs";
+
+
+export async function generateMetadata({ params }: { params: Promise<{ category: string }> }): Promise<Metadata> {
+  const { category } = await params;
+  // console.log("Generating metadata for product:", product);
+
+  const response = await Fetch<CategoryData>(`categories/${category}`);
+  const categoryData = response.data;
+  // console.log("Product Data:", Product);
+
+  return {
+    title: categoryData.meta_title || "Thobe's - Latest Thobe Design",
+    description: categoryData.meta_description || "This is the simple test description for Thobe's category.",
+    keywords: categoryData.meta_keywords || "Thobe, Latest Thobe Design, Fashion, Clothing",
+    alternates: {
+      canonical: `${process.env.NEXT_PUBLIC_BASE_URL}/${category}`,
+    },
+    openGraph: {
+      title: categoryData.meta_title || "Thobe's - Latest Thobe Design",
+      description: categoryData.meta_description || "This is the simple test description for Thobe's category.",
+      url: `${process.env.NEXT_PUBLIC_BASE_URL}/${category}`,
+      images: [
+        {
+          url: categoryData.image || "/assets/images/default-category.jpg",
+          width: 800,
+          height: 600,
+          alt: categoryData.meta_title || "Thobe's - Latest Thobe Design",
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: categoryData.meta_title || "Thobe's - Latest Thobe Design",
+      description: categoryData.meta_description || "This is the simple test description for Thobe's category.",
+      images: categoryData.image || "/assets/images/default-category.jpg",
+    },
+
+  };
+}
+
 
 export interface Category {
   id: number;
@@ -26,50 +67,14 @@ export interface CategoryData {
   data: Category; // The category object is inside the "data" field
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ caregory: string }> }): Promise<Metadata> {
-  const { caregory } = await params;
-
-  const response = await Fetch<CategoryData>(`categories/${caregory}`);
-  const category = response.data;
-
-  return {
-    title: category.meta_title || "Thobe's - Latest Thobe Design",
-    description: category.meta_description || "This is the simple test description for Thobe's category.",
-    keywords: category.meta_keywords || "Thobe, Latest Thobe Design, Fashion, Clothing",
-    alternates: {
-      canonical: `${process.env.NEXT_PUBLIC_BASE_URL}/${caregory}`,
-    },
-    openGraph: {
-      title: category.meta_title || "Thobe's - Latest Thobe Design",
-      description: category.meta_description || "This is the simple test description for Thobe's category.",
-      url: `${process.env.NEXT_PUBLIC_BASE_URL}/${caregory}`,
-      images: [
-        {
-          url: category.image || "/assets/images/default-category.jpg",
-          width: 800,
-          height: 600,
-          alt: category.meta_title || "Thobe's - Latest Thobe Design",
-        },
-      ],
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: category.meta_title || "Thobe's - Latest Thobe Design",
-      description: category.meta_description || "This is the simple test description for Thobe's category.",
-      images: category.image || "/assets/images/default-category.jpg",
-    },
-
-  };
-}
-
 
 export default async function CategoryPage({
   params,
 }: {
-  params: Promise<{ caregory: string }>;
+  params: Promise<{ category: string }>;
 }) {
   const resolvedParams = await params;
-  const slug = resolvedParams?.caregory;
+  const slug = resolvedParams?.category;
 
   if (!slug) {
     // If slug is undefined, handle it gracefully (e.g., redirect or show an error)
@@ -105,11 +110,36 @@ export default async function CategoryPage({
   const categories = categoryData;
   const products = productData;
 
-    // 🔥 Convert API products into schema format
-  const mapProducts = mapProductsForSchema(productData);
+    // Breadcrumb JSON-LD
+  const breadcrumbSchema = [
+    { name: "Home", url: "" },
+    {
+      name: categories[0].name,
+      url: `/${categories[0].slug}`,
+    }
+  ];
+
   return (
     <div className="min-h-screen bg-gray-50 custom_container py-8">
-      <ProductListSchema products={mapProducts} categoryName={slug} />
+      <ProductListSchema products={products} />
+      <Breadcrumb items={breadcrumbSchema} />
+      <nav className="text-sm mb-4" aria-label="Breadcrumb">
+              <ol className="list-reset flex text-text">
+                <li>
+                  <Link href="/" className="hover:underline text-primary">
+                    Home
+                  </Link>
+                  <span className="mx-2">/</span>
+                </li>
+                <li>
+                  <li className="text-text font-semibold">
+                    {categories[0].name}
+                  </li>
+                  {/* <span className="mx-2">/</span> */}
+                </li>
+                {/* <li className="text-text font-semibold">Product</li> */}
+              </ol>
+            </nav>
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
         <div>

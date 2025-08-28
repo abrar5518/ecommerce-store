@@ -3,12 +3,14 @@ import Image from 'next/image';
 import { CategoryResponse } from "@/types/categories";
 import { Fetch } from "@/utils/Fetch";
 import Link from "next/link";
+import WebsiteSchema from "@/components/schema/website";
 
 export default async function footer() {
     const { data: categoryData } = await Fetch<CategoryResponse>("categories");
     const topCategories = categoryData.slice(0, 8);
     return (
         <footer className="bg-primary text-white custom_container  relative">
+            <WebsiteSchema />
             <div className='flex justify-start items-start py-10 md:py-20'>
                 <div className="container w-full md:w-[80%] mx-auto px-4 flex flex-col md:flex-row justify-between items-start space-y-8 md:space-y-0">
                     {/* MegaMart Logo Section */}

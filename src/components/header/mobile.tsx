@@ -7,6 +7,8 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import { Category, CategoryResponse } from "@/types/categories"; // Correct import
 import { Fetch } from "@/utils/Fetch"; // Assuming Fetch is your fetch utility function
+import NavigationSchema from "@/components/schema/NavigationSchema";
+
 
 export default function HeaderNavbar() {
   const { cart } = useCart();
@@ -39,6 +41,7 @@ export default function HeaderNavbar() {
 
   return (
     <div className="bg-white border-b-2 custom_container py-5 md:hidden">
+      <NavigationSchema categories={categories} />
       {/* Desktop & Mobile Header Container */}
       <div className="flex justify-between items-center">
         {/* Logo on the left side */}

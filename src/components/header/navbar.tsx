@@ -1,6 +1,8 @@
 import { CategoryResponse } from "@/types/categories";
 import { Fetch } from "@/utils/Fetch";
 import Link from "next/link";
+import NavigationSchema from "@/components/schema/NavigationSchema";
+
 
 export default async function Navbar() {
   const { data: categoryData } = await Fetch<CategoryResponse>("categories");
@@ -9,6 +11,7 @@ export default async function Navbar() {
 
   return (
     <div className="bg-white border-b-2 custom_container hidden md:block">
+      <NavigationSchema categories={topCategories} />
       {/* Nav container */}
       <div className="flex justify-center items-center py-4 space-x-6 text-sm text-black">
         {/* Groceries with background, text-primary font-semibold */}

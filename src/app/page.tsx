@@ -10,7 +10,9 @@ import { CategoryResponse } from "@/types/categories";
 import { ProductResponse } from "@/types/product_list";
 import { Fetch } from "../utils/Fetch";
 import HeroSection from "@/components/home/hero";
-
+import Orgnization from "@/components/schema/orgnization";
+import Breadcrumb from "@/components/schema/breadcrumbs";
+import ProductListSchema from "@/components/schema/productList";
 
 export async function generateMetadata(): Promise<Metadata> {
 
@@ -33,10 +35,19 @@ export default async function Home() {
   const fourProducts = productData.slice(0, 4);
   const topCategories = categoryData.slice(2, 10);
 
-  // console.log(data);
+  // Breadcrumb JSON-LD
+  const breadcrumbSchema = [
+    { name: "Home", url: "" },
+
+  ];
 
   return (
     <div className="custom_container py-5">
+      {/* Schema start */}
+      <Orgnization />
+      <Breadcrumb items={breadcrumbSchema} />
+      <ProductListSchema products={productData} />
+      {/* schema end */}
       <Slider />
       <HeroSection />
       {/* section 2 start */}
