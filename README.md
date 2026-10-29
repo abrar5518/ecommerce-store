@@ -1,36 +1,46 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# E-Commerce Store
 
-## Getting Started
+A full-featured e-commerce storefront built with **Next.js 15** and TypeScript. It talks to an external product/order API and provides category browsing, a cart and a checkout flow with Stripe and PayPal integrations.
 
-First, run the development server:
+## Tech stack
+
+- **Next.js 15** (App Router, Turbopack in development) · **React 19** · **TypeScript**
+- **Tailwind CSS**
+- **Stripe** (`@stripe/react-stripe-js`, `@stripe/stripe-js`, `stripe`) and **PayPal** (`@paypal/react-paypal-js`) payment SDKs
+- **Axios** for API communication
+- Lucide / Iconify icons, NProgress route loading indicator
+
+## Features
+
+- Category-driven catalogue: dynamic category routes (`/[category]`) and an all-categories overview
+- Product browsing backed by a REST API (base URL configured via environment)
+- Shopping cart with shared state via React context (`src/context`)
+- Checkout flow (`/checkout`) wired for Stripe and PayPal payments
+- Responsive, component-based UI (`src/components`) with typed data models (`src/types`)
+
+## Getting started
 
 ```bash
+npm install
+cp .env.example .env   # then set NEXT_PUBLIC_API_BASE_URL to your API
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Command | Purpose |
+| --- | --- |
+| `npm run dev` | Start the development server (Turbopack) |
+| `npm run build` | Production build |
+| `npm run start` | Start the production server |
+| `npm run lint` | Run ESLint |
 
-## Learn More
+## Environment
 
-To learn more about Next.js, take a look at the following resources:
+Configuration is provided through environment variables — copy `.env.example` to `.env` and fill in your own values. Never commit a real `.env` file.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Built by [Abrar Hussain](https://github.com/abrar5518) — Senior Full Stack Developer (Next.js · Laravel · Node.js).
